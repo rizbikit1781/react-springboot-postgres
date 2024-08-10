@@ -64,13 +64,14 @@ public class ContactService {
         .map(name -> "." + name.substring(filename.lastIndexOf(".") + 1)).orElse(".png");
 
     private final BiFunction<String, MultipartFile, String> photoFunction = (id, image) -> {
+        String filename = id + fileExtension.apply(image.getOriginalFilename());
         try {
             Path fileStorageLocation = Paths.get("").toAbsolutePath().normalize();
             if (!Files.exists(fileStorageLocation)) { Files.createDirectories(fileStorageLocation);}
-            Files.copy(image.getInputStream(), fileStorageLocation.resolve(id + fileExtension.apply(image.getOriginalFilename())), REPLACE_EXISTING);
+            Files.copy(image.getInputStream(), fileStorageLocation.resolve(filename), REPLACE_EXISTING);
             return ServletUriComponentsBuilder
             .fromCurrentContextPath()
-            .path("/contacts/image/" + id + fileExtension.apply(image.getOriginalFilename())).toUriString();
+            .path("/contacts/image/" + filename).toUriString();
         } catch (Exception exception) {
             throw new RuntimeException("Unable to save image");
         }
