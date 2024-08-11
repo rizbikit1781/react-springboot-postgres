@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static com.example.constant.Constant.PHOTO_DIRECTORY;
 
 @Service
 @Slf4j
@@ -52,6 +53,7 @@ public class ContactService {
 
     public String uploadPhoto(String id, MultipartFile file) 
     {
+        log.info("Saving picture for user Id: {}", id);
         Contact contact = getContact(id);
         String photoUrl = photoFunction.apply(id, file);
         contact.setPhotoUrl(photoUrl);      
@@ -66,7 +68,7 @@ public class ContactService {
     private final BiFunction<String, MultipartFile, String> photoFunction = (id, image) -> {
         String filename = id + fileExtension.apply(image.getOriginalFilename());
         try {
-            Path fileStorageLocation = Paths.get("").toAbsolutePath().normalize();
+            Path fileStorageLocation = Paths.get(PHOTO_DIRECTORY).toAbsolutePath().normalize();
             if (!Files.exists(fileStorageLocation)) { Files.createDirectories(fileStorageLocation);}
             Files.copy(image.getInputStream(), fileStorageLocation.resolve(filename), REPLACE_EXISTING);
             return ServletUriComponentsBuilder
